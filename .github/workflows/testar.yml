@@ -1,0 +1,26 @@
+name: Testar coleta
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  testar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Coletar o exercício corrente (SIOP)
+        run: python pipeline/coleta_siop.py $(date +%Y)
+      - name: Coletar as emendas do exercício corrente (Portal)
+        run: python pipeline/coleta_emendas.py $(date +%Y)
+      - name: Coletar partidos (Câmara e Senado)
+        run: python pipeline/coleta_parlamentares.py
+      - name: Montar o site
+        run: python pipeline/montar.py
